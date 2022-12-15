@@ -9,46 +9,78 @@ import UIKit
 import Kingfisher
 
 class ViewController: UIViewController {
-
+    
+    // MARK: - Outlets
     @IBOutlet weak var collectionView: UICollectionView!
+    
+    // MARK: - Variables
     private let collectionPadding: CGFloat = 10
     private var users: [Information] = []
-    private var nextURL: String? = "https://rickandmortyapi.com/api/character"
+    private var pageNumber: Int = 1
+    private var isFetching: Bool = false
+    private var totalPages: Int = 1
+    private var searchText: String = ""
+    private var isFiltered: Bool = false
+    //@IBOutlet weak var nextButton: UIButton!
     
-    @IBOutlet weak var nextButton: UIButton!
-    
+    // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Characters"
         self.fetchUsers()
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            let totalItem: CGFloat = 3
-            let width = collectionView.frame.width
-            let totalSpacing = (collectionPadding * 2) + ((totalItem - 1) * collectionPadding)
-            let itemWidth: CGFloat = (width - totalSpacing) / 3
-            layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
-            layout.minimumLineSpacing = collectionPadding
-            layout.minimumInteritemSpacing = collectionPadding
-            collectionView.contentInset = .init(top: collectionPadding, left: collectionPadding, bottom: collectionPadding, right: collectionPadding)
-        }
+        configCollectionView()
+        setupSearchbar()
     }
     
-    @IBAction func nextAction() {
+    // MARK: - Other methods
+    private func configCollectionView() {
+        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else {
+            return
+        }
+        let totalItem: CGFloat = 3
+        let width = collectionView.frame.width
+        let totalSpacing = (collectionPadding * 2) + ((totalItem - 1) * collectionPadding)
+        let itemWidth: CGFloat = (width - totalSpacing) / 3
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+        layout.minimumLineSpacing = collectionPadding
+        layout.minimumInteritemSpacing = collectionPadding
+        collectionView.contentInset = .init(top: collectionPadding, left: collectionPadding, bottom: collectionPadding, right: collectionPadding)
+    }
+    
+    private func setupSearchbar() {
+        let search = UISearchController(searchResultsController: nil)
+        search.delegate = self
+        search.searchBar.delegate = self
+        self.navigationItem.searchController = search
+    }
+    
+    /*@IBAction func nextAction() {
+     pageNumber += 1
+     fetchUsers()
+     
+     }*/
+    
+    func nextAction() {
+        pageNumber += 1
         fetchUsers()
     }
     
     private func fetchUsers() {
         // Step 1: Create URL from string
-        guard let urlStr = self.nextURL else {
-            return
+        var urlStr = "https://rickandmortyapi.com/api/character/?page=\(pageNumber)"
+        if searchText.isEmpty == false {
+            urlStr += "&name=\(searchText)"
         }
+        //https://rickandmortyapi.com/api/character/?name=rick
         guard let url = URL(string: urlStr) else {
             return
         }
+        isFetching = true
         // Step 2: Making a Request
         let request = URLRequest(url: url)
         // Step 3: Fetch data from URL
         URLSession.shared.dataTask(with: request) { data, response, error in
+            self.isFetching = false
             if let error = error {
                 print(error)
             } else if let data = data {
@@ -58,7 +90,7 @@ class ViewController: UIViewController {
                     let jsonDecoder = JSONDecoder()
                     let model: RockAndMorty = try jsonDecoder.decode(RockAndMorty.self, from: data)
                     print(model.info.count)
-                    self.nextURL = model.info.next
+                    self.totalPages = model.info.pages
                     self.users += model.results
                     
                     DispatchQueue.main.async {
@@ -71,10 +103,11 @@ class ViewController: UIViewController {
             }
         }.resume()
     }
-
-
+    
+    
 }
 
+// MARK: - CollectionView methods
 extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return users.count
@@ -84,7 +117,7 @@ extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! CollectionViewCell
         let information = users[indexPath.row]
         cell.setvalues(information)
-       
+        
         return cell
     }
     
@@ -98,5 +131,34 @@ extension ViewController : UICollectionViewDelegate, UICollectionViewDataSource 
         navigationController?.pushViewController(rickmortyVC, animated: true)
     }
     
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if isFetching == false
+            && pageNumber < totalPages
+            && indexPath.item == users.count - 1 {
+            self.nextAction()
+        }
+    }
+}
+
+// MARK: - Searchbar methods
+extension ViewController: UISearchControllerDelegate, UISearchBarDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.searchText = ""
+        isFiltered = false
+        pageNumber = 1
+        users = []
+        collectionView.reloadData()
+        self.fetchUsers()
+    }
+    
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        pageNumber = 1
+        searchText = searchBar.text ?? ""
+        users = []
+        collectionView.reloadData()
+        fetchUsers()
+    }
     
 }

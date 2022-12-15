@@ -44,17 +44,15 @@ class CharacterInfoViewController: UIViewController {
     }
     
     private func configureViews() {
-        imageview.layer.cornerRadius = 20
-        imageview.clipsToBounds = true
-        subview.layer.cornerRadius = 20
-        subview.clipsToBounds = true
+        imageview.setCornerRadius(20)
+        subview.setCornerRadius(20)
         
     }
     
     private func setvalues(_ information: Information) {
         nameLabel.text = information.name
-        statusLabel.text = information.status
-        genderLabel.text = information.gender
+        statusLabel.text = information.status?.rawValue
+        genderLabel.text = information.gender?.rawValue
         originLabel.text = information.origin?.name
         episodesLabel.text = "\(information.episode?.count ?? 0)"
         let url = URL(string: information.image ?? "")
