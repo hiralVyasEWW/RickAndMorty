@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol FilterDelegate {
+    func filterCharacter(didSelectFilterOptions options: [URLQueryItem])
+}
+
 class FilterViewController: UITableViewController {
     
     @IBOutlet weak var nameText: UITextField!
@@ -15,7 +19,9 @@ class FilterViewController: UITableViewController {
     @IBOutlet weak var speciesPicker: UIPickerView!
     @IBOutlet weak var submitButton: UIButton!
     
-    private lazy var speciesArray: [Species] = Species.allCases
+    var delegate: FilterDelegate?
+
+    private lazy var speciesArray: [String] = ["All", "Human", "Alien"]
     
     var pickerData: [String] = [String]()
     
@@ -29,12 +35,30 @@ class FilterViewController: UITableViewController {
    
     
     @IBAction func submitTapped() {
-        var filter = Dictionary<String, String>()
+       // var filter = Dictionary<String, String>()
+       
         let name = nameText.notNullText()
+
+        var queryItemArray: [URLQueryItem] = []
         if name.isNotEmpty {
-            filter["name"] = name
+            queryItemArray.append(URLQueryItem(name: "name", value: name))
         }
-        print(filter)
+        if genderSegement.selectedSegmentIndex > -1 {
+            let gender = genderSegement.titleForSegment(at: genderSegement.selectedSegmentIndex)
+            queryItemArray.append(URLQueryItem(name: "gender", value: gender))
+            
+        }
+        if statusSegment.selectedSegmentIndex > -1 {
+            let status = statusSegment.titleForSegment(at: statusSegment.selectedSegmentIndex)
+            queryItemArray.append(URLQueryItem(name: "status", value: status))
+        }
+        let species = speciesArray[speciesPicker.selectedRow(inComponent: 0)]
+        if species != "All" {
+            queryItemArray.append(URLQueryItem(name: "species", value: species))
+        }
+        self.delegate?.filterCharacter(didSelectFilterOptions: queryItemArray)
+        navigationController?.popViewController(animated: true)
+       
     }
     
 }
@@ -51,6 +75,6 @@ extension FilterViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        speciesArray[row].rawValue
+        speciesArray[row]
     }
 }

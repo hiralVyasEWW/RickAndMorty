@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     // MARK: - Outlets
     @IBOutlet weak var collectionView: UICollectionView!
     
+   
     // MARK: - Variables
     private let collectionPadding: CGFloat = 10
     private var users: [Information] = []
@@ -23,6 +24,8 @@ class ViewController: UIViewController {
     private var isFiltered: Bool = false
     //@IBOutlet weak var nextButton: UIButton!
     
+    var queryItemArray: [URLQueryItem] = []
+    
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +33,13 @@ class ViewController: UIViewController {
         self.fetchUsers()
         configCollectionView()
         setupSearchbar()
+       
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let filterVC = segue.destination as? FilterViewController {
+            filterVC.delegate = self
+        }
     }
     
     // MARK: - Other methods
@@ -66,13 +76,13 @@ class ViewController: UIViewController {
     }
     
     private func fetchUsers() {
-        // Step 1: Create URL from string
-        var urlStr = "https://rickandmortyapi.com/api/character/?page=\(pageNumber)"
-        if searchText.isEmpty == false {
-            urlStr += "&name=\(searchText)"
-        }
-        //https://rickandmortyapi.com/api/character/?name=rick
-        guard let url = URL(string: urlStr) else {
+       
+        let url = "https://rickandmortyapi.com/api/character/"
+        var urlComps = URLComponents(string: url)!
+        urlComps.queryItems = queryItemArray
+        urlComps.queryItems?.append(.init(name: "page", value: String(pageNumber)))
+        print(urlComps.url?.absoluteString ?? "")
+        guard let url = urlComps.url else {
             return
         }
         isFetching = true
@@ -161,4 +171,16 @@ extension ViewController: UISearchControllerDelegate, UISearchBarDelegate {
         fetchUsers()
     }
     
+}
+
+// MARK: - Filter delegate
+
+extension ViewController: FilterDelegate {
+    func filterCharacter(didSelectFilterOptions options: [URLQueryItem]) {
+        self.queryItemArray = options
+        self.pageNumber = 1
+        self.users = []
+        self.collectionView.reloadData()
+        self.fetchUsers()
+    }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct RockAndMorty : Codable {
     let info: CharacterApiInfo
@@ -22,7 +23,7 @@ struct Information : Codable {
     let id : Int
     var name, image : String?
     let gender: Gender?
-    let species: Species?
+    let species: String?
     let status: CharacterStatus?
     let origin : Origin?
     let episode : [String]?
@@ -45,8 +46,17 @@ enum CharacterStatus: String, Codable {
     case unknownStatus = "unknown"
 }
 
-enum Species: String, Codable, CaseIterable {
-    case human = "Human"
-    case alien = "Alien"
-    case unknownSpecies = "unknown"
+extension CharacterStatus {
+    
+    var color: UIColor {
+        switch self {
+        case .alive:
+            return .green
+        case .dead:
+            return .red
+        case .unknownStatus:
+            return .gray
+        }
+    }
+    
 }

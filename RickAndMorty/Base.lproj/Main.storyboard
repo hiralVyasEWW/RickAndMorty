@@ -55,11 +55,21 @@
                                                         <constraint firstAttribute="trailing" secondItem="NLt-wi-LUH" secondAttribute="trailing" constant="6" id="taT-cm-boh"/>
                                                     </constraints>
                                                 </view>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oh2-Tb-zaf">
+                                                    <rect key="frame" x="104" y="8" width="16" height="16"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="N2N-xh-BcY"/>
+                                                        <constraint firstAttribute="width" secondItem="oh2-Tb-zaf" secondAttribute="height" id="Toj-zS-LYy"/>
+                                                    </constraints>
+                                                </view>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="nMC-z5-A9Z" secondAttribute="bottom" id="It2-Bp-iUp"/>
                                                 <constraint firstItem="nMC-z5-A9Z" firstAttribute="leading" secondItem="rHT-bU-wUp" secondAttribute="leading" id="JL7-Ne-F6f"/>
+                                                <constraint firstAttribute="trailing" secondItem="oh2-Tb-zaf" secondAttribute="trailing" constant="8" id="JcN-2X-Ipz"/>
                                                 <constraint firstItem="OQk-my-dgF" firstAttribute="leading" secondItem="rHT-bU-wUp" secondAttribute="leading" id="Ly4-z3-FNu"/>
+                                                <constraint firstItem="oh2-Tb-zaf" firstAttribute="top" secondItem="rHT-bU-wUp" secondAttribute="top" constant="8" id="PcV-kh-TbO"/>
                                                 <constraint firstItem="nMC-z5-A9Z" firstAttribute="top" secondItem="rHT-bU-wUp" secondAttribute="top" id="Pgf-kt-Aq4"/>
                                                 <constraint firstAttribute="trailing" secondItem="nMC-z5-A9Z" secondAttribute="trailing" id="Zkc-bs-G1b"/>
                                                 <constraint firstAttribute="bottom" secondItem="OQk-my-dgF" secondAttribute="bottom" id="cwO-8h-Zmj"/>
@@ -69,6 +79,7 @@
                                         <connections>
                                             <outlet property="imageview" destination="nMC-z5-A9Z" id="Ttk-hm-vzu"/>
                                             <outlet property="label" destination="NLt-wi-LUH" id="RHX-5g-tfb"/>
+                                            <outlet property="statusView" destination="oh2-Tb-zaf" id="Cd5-00-lR6"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -90,7 +101,7 @@
                     <navigationItem key="navigationItem" id="u2F-U2-W1J">
                         <barButtonItem key="rightBarButtonItem" image="ic_filter" id="m1p-9t-X8j">
                             <connections>
-                                <segue destination="MpP-zD-U6r" kind="show" id="F2d-Ko-JhP"/>
+                                <segue destination="MpP-zD-U6r" kind="show" identifier="toFilter" id="F2d-Ko-JhP"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -408,7 +419,7 @@
                                                             </subviews>
                                                         </stackView>
                                                         <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="V8f-e7-BnM">
-                                                            <rect key="frame" x="0.0" y="20" width="310" height="216"/>
+                                                            <rect key="frame" x="0.0" y="20.333333333333329" width="310" height="216.33333333333337"/>
                                                         </pickerView>
                                                     </subviews>
                                                 </stackView>
